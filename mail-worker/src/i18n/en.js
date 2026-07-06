@@ -27,6 +27,7 @@ const en = {
 	externalToRequired: 'Recipient cannot be empty',
 	externalSubjectRequired: 'Subject cannot be empty',
 	externalContentRequired: 'Content cannot be empty, provide at least one of text or html',
+	invalidJsonBody: 'Request body is not valid JSON. Check for smart quotes or missing quotes/commas.',
 	sendEmailNotCurUser: 'Sender email does not belong to current user',
 	notExistEmailReply: 'Mail does not exist and cannot be replied to',
 	imageAttLimit: 'The maximum number of image attachments is 10',

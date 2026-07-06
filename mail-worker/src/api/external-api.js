@@ -1,6 +1,8 @@
 import app from '../hono/hono';
 import result from '../model/result';
 import externalService from '../service/external-service';
+import BizError from '../error/biz-error';
+import { t } from '../i18n/i18n';
 
 /**
  * 外部发信 API
@@ -22,6 +24,12 @@ import externalService from '../service/external-service';
  *   }
  */
 app.post('/public/sendEmail', async (c) => {
-	const data = await externalService.sendEmail(c, await c.req.json());
+	let body = null;
+	try {
+		body = await c.req.json();
+	} catch (e) {
+		throw new BizError(t('invalidJsonBody'), 400);
+	}
+	const data = await externalService.sendEmail(c, body);
 	return c.json(result.ok(data));
 });

@@ -27,6 +27,7 @@ const zh = {
 	externalToRequired: '收件人不能为空',
 	externalSubjectRequired: '邮件标题不能为空',
 	externalContentRequired: '邮件内容不能为空，text 或 html 至少填写一个',
+	invalidJsonBody: '请求体不是合法的 JSON，请检查是否使用了中文引号或缺少引号/逗号',
 	sendEmailNotCurUser: '发件人邮箱非当前用户所有',
 	notExistEmailReply: '邮件不存在无法回复',
 	imageAttLimit: '图片不能超过10个',
