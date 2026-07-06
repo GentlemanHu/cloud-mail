@@ -385,6 +385,39 @@
             </div>
           </div>
 
+          <div class="settings-card">
+            <div class="card-title">{{ $t('externalApi') }}</div>
+            <div class="card-content">
+              <div class="setting-item">
+                <div>
+                  <span>{{ $t('apiToken') }}</span>
+                  <el-tooltip effect="dark" :content="$t('apiTokenDesc')">
+                    <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+                  </el-tooltip>
+                </div>
+                <div class="bot-verify">
+                  <span>{{ setting.publicToken ? maskToken(setting.publicToken) : $t('apiTokenEmpty') }}</span>
+                  <el-button class="opt-button" size="small" type="primary" :disabled="!setting.publicToken"
+                             @click="copyPublicToken">
+                    <Icon icon="ph:copy" width="16" height="16"/>
+                  </el-button>
+                  <el-button class="opt-button" size="small" type="primary" @click="genToken">
+                    <Icon icon="tabler:refresh" width="16" height="16"/>
+                  </el-button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div><span>{{ $t('apiDoc') }}</span></div>
+                <div class="forward">
+                  <el-button class="opt-button" style="margin-top: 0" size="small" type="primary"
+                             @click="apiDocShow = true">
+                    <Icon icon="fluent:document-48-regular" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="settings-card about">
             <div class="card-title">{{ $t('about') }}</div>
             <div class="card-content">
@@ -799,13 +832,22 @@
         </el-form>
         <el-button type="primary" style="width: 100%;" :loading="settingLoading" @click="saveAiCodeFilter">{{ $t('save') }}</el-button>
       </el-dialog>
+      <el-dialog v-model="apiDocShow" :title="$t('apiDoc')" class="api-doc-dialog" top="6vh" width="640">
+        <div class="api-doc">
+          <p>{{ $t('apiDocIntro') }}</p>
+          <div class="api-doc-endpoint">POST /api/public/sendEmail</div>
+          <p>{{ $t('apiDocAuth') }}</p>
+          <pre>{{ curlExample }}</pre>
+          <p class="api-doc-tip">{{ $t('apiDocTip') }}</p>
+        </div>
+      </el-dialog>
     </el-scrollbar>
   </div>
 </template>
 
 <script setup>
 import {computed, defineOptions, nextTick, reactive, ref} from "vue";
-import {deleteBackground, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
+import {deleteBackground, genPublicToken, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
 import {useSettingStore} from "@/store/setting.js";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
@@ -847,6 +889,7 @@ const thirdEmailShow = ref(false)
 const forwardRulesShow = ref(false)
 const emailPrefixShow = ref(false)
 const showResendList = ref(false)
+const apiDocShow = ref(false)
 const settingStore = useSettingStore();
 const uiStore = useUiStore();
 const {settings: setting} = storeToRefs(settingStore);
@@ -1313,6 +1356,71 @@ function aiCodeFilterAddTag(val) {
   })
 }
 
+
+const curlExample = computed(() => {
+  const origin = window.location.origin
+  const domain = (settingStore.domainList[0] || '@example.com').slice(1)
+  const token = setting.value.publicToken || 'YOUR_API_TOKEN'
+  return `curl -X POST ${origin}/api/public/sendEmail \\
+  -H "Authorization: ${token}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "from": "noreply@${domain}",
+    "to": ["someone@example.com"],
+    "subject": "Hello",
+    "html": "<p>Hello World</p>"
+  }'`
+})
+
+function maskToken(token) {
+  if (!token) return ''
+  if (token.length <= 12) return token
+  return token.slice(0, 8) + '****' + token.slice(-4)
+}
+
+function genToken() {
+  ElMessageBox.confirm(t('apiTokenGenConfirm'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    type: 'warning'
+  }).then(() => {
+    genPublicToken().then((data) => {
+      setting.value.publicToken = data.token
+      ElMessage({
+        message: t('apiTokenGenSuccess'),
+        type: 'success',
+        plain: true
+      })
+    })
+  }).catch(() => {})
+}
+
+function copyPublicToken() {
+  const token = setting.value.publicToken
+  if (!token) return
+  const done = () => ElMessage({message: t('copySuccess'), type: 'success', plain: true})
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(token).then(done).catch(() => fallbackCopy(token, done))
+  } else {
+    fallbackCopy(token, done)
+  }
+}
+
+function fallbackCopy(text, done) {
+  const el = document.createElement('textarea')
+  el.value = text
+  el.style.position = 'fixed'
+  el.style.opacity = '0'
+  document.body.appendChild(el)
+  el.select()
+  try {
+    document.execCommand('copy')
+    done()
+  } catch (e) {
+    // ignore
+  }
+  document.body.removeChild(el)
+}
 
 function delBackground() {
   ElMessageBox.confirm(t('delBackgroundConfirm'), {
@@ -1991,6 +2099,44 @@ form .el-button {
 
 :deep(.el-select__wrapper) {
   min-height: 28px;
+}
+
+.api-doc {
+  font-size: 14px;
+  line-height: 1.7;
+
+  p {
+    margin: 0 0 12px;
+    color: var(--el-text-color-regular);
+  }
+
+  .api-doc-endpoint {
+    display: inline-block;
+    font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+    background: var(--el-fill-color-light);
+    color: var(--el-color-primary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  pre {
+    background: var(--el-fill-color-light);
+    border-radius: 8px;
+    padding: 14px;
+    overflow-x: auto;
+    font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    white-space: pre;
+    margin: 0 0 12px;
+  }
+
+  .api-doc-tip {
+    color: var(--el-color-warning);
+    font-size: 13px;
+  }
 }
 
 </style>

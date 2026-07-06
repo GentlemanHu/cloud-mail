@@ -5,13 +5,12 @@ import externalService from '../service/external-service';
 /**
  * 外部发信 API
  *
- * 鉴权：走 /public 前缀鉴权（见 security.js），请求头 Authorization 需为：
- *   - 系统的 public token（管理员通过 /api/public/genToken 生成），或
- *   - 部署时配置的 jwt_secret（作为稳定的内部 API master key）
+ * 鉴权：走 /public 前缀鉴权（见 security.js），请求头 Authorization 填入系统的 public token。
+ * public token 由管理员在后台「系统设置 - 外部接口」一键生成，或通过 /api/public/genToken（邮箱+密码）获取。
  *
  * 示例：
  *   POST /api/public/sendEmail
- *   Authorization: <jwt_secret 或 public token>
+ *   Authorization: <public token>
  *   Content-Type: application/json
  *   {
  *     "from": "noreply@yourdomain.com",

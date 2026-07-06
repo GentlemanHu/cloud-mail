@@ -44,6 +44,8 @@ const requirePerms = [
 	'/setting/set',
 	'/setting/query',
 	'/setting/setBlacklist',
+	'/setting/genPublicToken',
+	'/setting/publicToken',
 	'/user/delete',
 	'/user/setPwd',
 	'/user/setStatus',
@@ -82,7 +84,7 @@ const premKey = {
 	'all-email:query': ['/allEmail/list','/allEmail/latest'],
 	'all-email:delete': ['/allEmail/delete','/allEmail/batchDelete'],
 	'setting:query': ['/setting/query'],
-	'setting:set': ['/setting/set', '/setting/setBackground','/setting/deleteBackground','/setting/setBlacklist'],
+	'setting:set': ['/setting/set', '/setting/setBackground','/setting/deleteBackground','/setting/setBlacklist','/setting/genPublicToken','/setting/publicToken'],
 	'analysis:query': ['/analysis/echarts'],
 	'reg-key:add': ['/regKey/add'],
 	'reg-key:query': ['/regKey/list','/regKey/history'],
@@ -105,11 +107,7 @@ app.use('*', async (c, next) => {
 
 		const userPublicToken = await c.env.kv.get(KvConst.PUBLIC_KEY);
 		const publicToken = c.req.header(constant.TOKEN_HEADER);
-		// 允许使用 public token 或部署密钥 jwt_secret（作为稳定的内部 API master key）
-		const masterToken = c.env.jwt_secret;
-		const tokenValid = (userPublicToken && publicToken === userPublicToken)
-			|| (masterToken && publicToken === masterToken);
-		if (!tokenValid) {
+		if (!userPublicToken || publicToken !== userPublicToken) {
 			throw new BizError(t('publicTokenFail'), 401);
 		}
 		return await next();

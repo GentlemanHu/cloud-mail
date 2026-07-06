@@ -9,6 +9,7 @@ import BizError from '../error/biz-error';
 import {t} from '../i18n/i18n'
 import verifyRecordService from './verify-record-service';
 import userContext from '../security/user-context';
+import { v4 as uuidv4 } from 'uuid';
 
 const settingService = {
 
@@ -121,7 +122,21 @@ const settingService = {
 
 		settingRow.storageType = await r2Service.storageType(c);
 
+		settingRow.publicToken = await c.env.kv.get(KvConst.PUBLIC_KEY) || '';
+
 		return settingRow;
+	},
+
+	// 生成 / 重置外部 API 令牌（全局唯一，覆盖旧的即失效），供后台管理员一键生成
+	async genPublicToken(c) {
+		const token = uuidv4();
+		await c.env.kv.put(KvConst.PUBLIC_KEY, token);
+		return { token };
+	},
+
+	// 删除外部 API 令牌（等同于关闭外部接口访问）
+	async deletePublicToken(c) {
+		await c.env.kv.delete(KvConst.PUBLIC_KEY);
 	},
 
 	async set(c, params) {

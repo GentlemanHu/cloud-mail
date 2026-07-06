@@ -23,3 +23,11 @@ export function deleteBackground() {
 export function setBlackList(params) {
     return http.put('/setting/setBlacklist', params)
 }
+
+export function genPublicToken() {
+    return http.put('/setting/genPublicToken')
+}
+
+export function deletePublicToken() {
+    return http.delete('/setting/publicToken')
+}

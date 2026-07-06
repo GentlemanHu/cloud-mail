@@ -336,6 +336,17 @@ const zh = {
     searchUser: '搜索用户',
     searchEmail: '搜索邮箱',
     searchSender: '搜索发件人',
-    userEmail: '用户邮箱'
+    userEmail: '用户邮箱',
+    externalApi: '外部接口',
+    apiToken: 'API 令牌',
+    apiTokenDesc: '外部系统调用接口的身份令牌，全局唯一，重新生成后旧令牌立即失效',
+    apiTokenEmpty: '未生成',
+    apiTokenGenConfirm: '确定要生成新的 API 令牌吗？重新生成后，正在使用旧令牌的外部调用将立即失效',
+    apiTokenGenSuccess: 'API 令牌已生成',
+    apiDoc: '接口文档',
+    apiDocIntro: '通过下方 API 令牌，外部系统可调用发信接口，以系统已配置域名下的任意邮箱作为发送方发送邮件；发送记录会同步落库并在「全部邮件」中可见。',
+    apiDocAuth: '鉴权：请求头 Authorization 填入上方 API 令牌。',
+    apiDocTip: '提示：发送方域名必须是系统已配置且已在发信服务商（Cloudflare / Resend）验证过的域名，否则无法投递。',
+    copySuccess: '已复制到剪贴板'
 }
 export default zh

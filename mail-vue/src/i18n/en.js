@@ -336,7 +336,18 @@ const en = {
     searchUser: 'Search by user',
     searchEmail: 'Search by Email',
     searchSender: 'Search by Sender',
-    userEmail: 'Email Address'
+    userEmail: 'Email Address',
+    externalApi: 'External API',
+    apiToken: 'API Token',
+    apiTokenDesc: 'Identity token for external systems to call the API. Globally unique; regenerating immediately invalidates the old one.',
+    apiTokenEmpty: 'Not generated',
+    apiTokenGenConfirm: 'Generate a new API token? External calls using the old token will stop working immediately.',
+    apiTokenGenSuccess: 'API token generated',
+    apiDoc: 'API Docs',
+    apiDocIntro: 'With the API token below, external systems can call the send-email API to send mail from any mailbox under a configured domain. Sent messages are stored and visible in "All Mail".',
+    apiDocAuth: 'Auth: put the API token above into the Authorization header.',
+    apiDocTip: 'Note: the sender domain must be configured and verified with the mail provider (Cloudflare / Resend), otherwise delivery will fail.',
+    copySuccess: 'Copied to clipboard'
 }
 
 export default en

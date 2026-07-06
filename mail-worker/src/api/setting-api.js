@@ -33,3 +33,13 @@ app.put('/setting/setBlacklist', async (c) => {
 	return c.json(result.ok(setting));
 })
 
+app.put('/setting/genPublicToken', async (c) => {
+	const data = await settingService.genPublicToken(c);
+	return c.json(result.ok(data));
+})
+
+app.delete('/setting/publicToken', async (c) => {
+	await settingService.deletePublicToken(c);
+	return c.json(result.ok());
+})
+
